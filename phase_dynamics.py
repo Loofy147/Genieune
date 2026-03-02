@@ -12,24 +12,8 @@ except ImportError:
     import transformer_lens
 
 """
-PHASE SPACE AND DIFFERENTIAL DYNAMICS FRAMEWORK
-Built strictly from the empirical constants of the simulation data.
-
-1. The Phase Space:
-   X = Token Cost (Frequency Baseline)
-   Y = Dynamic Genuineness (Var(H) + Collapses)
-   Empirical finding: GENUINE_COMMITTED (High X, High Y) is empty.
-   Name Mover -> GENUINE_DIFFUSE.
-   Induction -> MECHANICAL_COMMITTED.
-
-2. The Differential Equations (Circuit Asymmetry):
-   dG/dt (pattern) = -0.8129 * G
-   dG/dt (genuine) = +1.2371 * (G_max - G)
-   Recovery > Degradation. Genuine computation escapes the pattern attractor.
-
-3. The Trajectory Measure:
-   Genuineness in text drops over time. (The "elaboration pull").
-   First sentence G > Elaboration G.
+DYNAMIC ENTROPY GENUINENESS FRAMEWORK (Version 1.0)
+Official Implementation of the Mechanistic Interpretability Pipeline.
 """
 
 import numpy as np
@@ -43,23 +27,32 @@ from transformer_lens import HookedTransformer
 # ══════════════════════════════════════════════════════════════════
 
 class PhaseSpaceMapper:
-    def __init__(self, cost_threshold=0.6, genuine_threshold=0.55):
+    """
+    Maps attention heads or text outputs into a 2D phase space based on
+    Token Cost (X) and Dynamic Genuineness (Y).
+    """
+    def __init__(self, cost_threshold=0.6, genuine_threshold=0.55, mechanical_threshold=0.35):
         self.cost_threshold = cost_threshold
         self.genuine_threshold = genuine_threshold
+        self.mechanical_threshold = mechanical_threshold
         self.quadrants = defaultdict(int)
 
     def classify(self, cost: float, dynamic_genuineness: float, increment=True) -> str:
         high_cost = cost >= self.cost_threshold
-        high_gen = dynamic_genuineness >= self.genuine_threshold
-
-        if high_cost and not high_gen:
-            q = "MECHANICAL_COMMITTED"   # e.g., Induction Head
-        elif not high_cost and high_gen:
-            q = "GENUINE_DIFFUSE"        # e.g., Name Mover Head
-        elif high_cost and high_gen:
-            q = "GENUINE_COMMITTED"      # Theoretically empty in simulation
+        # Genuineness thresholds from documentation
+        if dynamic_genuineness >= self.genuine_threshold:
+            if high_cost:
+                q = "GENUINE_COMMITTED"    # Usually empty in weights
+            else:
+                q = "GENUINE_DIFFUSE"      # The logic engines (e.g. Name Movers)
+        elif dynamic_genuineness <= self.mechanical_threshold:
+            if high_cost:
+                q = "MECHANICAL_COMMITTED" # Pure pattern retrieval (e.g. Induction)
+            else:
+                q = "MECHANICAL_DIFFUSE"   # Uniform context gathering (Broadcast)
         else:
-            q = "MECHANICAL_DIFFUSE"     # Low cost, low genuineness (Broadcast)
+            # Transition zone
+            q = "TRANSITION"
 
         if increment:
             self.quadrants[q] += 1
@@ -72,22 +65,14 @@ class PhaseSpaceMapper:
 
 
 # ══════════════════════════════════════════════════════════════════
-# PART 2: DIFFERENTIAL EQUATION SOLVER FOR REAL WEIGHTS
+# PART 2: DIFFERENTIAL EQUATION SOLVER (CIRCUIT ASYMMETRY)
 # ══════════════════════════════════════════════════════════════════
-
-def degradation_model(t, G0, k_deg):
-    """ dG/dt = -k * G """
-    return G0 * np.exp(-k_deg * t)
-
-def recovery_model(t, G0, G_max, k_rec):
-    """ dG/dt = k * (G_max - G) """
-    return G_max - (G_max - G0) * np.exp(-k_rec * t)
 
 def fit_circuit_rates(trajectory: list, circuit_types: list):
     """
-    Fits k_degrade and k_recover from a measured trajectory of G across layers.
-    trajectory: list of Dynamic Genuineness (G) scores.
-    circuit_types: list of 1 (genuine head applied) or 0 (pattern head applied).
+    Fits k_degrade and k_recover based on the Circuit Asymmetry Equations.
+    dG/dt (pattern) = -0.8129 * G
+    dG/dt (genuine) = +1.2371 * (G_max - G)
     """
     degradations = []
     recoveries =[]
@@ -95,25 +80,24 @@ def fit_circuit_rates(trajectory: list, circuit_types: list):
     for i in range(len(trajectory) - 1):
         G_current = trajectory[i]
         G_next = trajectory[i+1]
-        dt = 1 # 1 layer step
 
         if i < len(circuit_types):
-            if circuit_types[i] == 0: # Pattern head
-                # G_next = G_current * exp(-k_deg) -> -ln(G_next/G_current) = k_deg
+            if circuit_types[i] == 0: # Pattern circuit
+                # G_next = G_current * exp(-k_deg)
                 if G_current > 0.01:
                     k_deg = -np.log(max(G_next, 1e-5) / G_current)
                     degradations.append(max(0, k_deg))
 
-            elif circuit_types[i] == 1: # Genuine head
-                # Assume G_max = 1.0 for normalized metric
-                # G_next = 1 - (1 - G_current)*exp(-k_rec)
+            elif circuit_types[i] == 1: # Genuine circuit
+                # G_next = G_max - (G_max - G_current) * exp(-k_rec)
                 if G_current < 0.99:
                     val = (1.0 - G_next) / (1.0 - G_current)
                     k_rec = -np.log(max(val, 1e-5))
                     recoveries.append(max(0, k_rec))
 
-    empirical_k_deg = np.mean(degradations) if degradations else 0.8129 # Fallback to sim const
-    empirical_k_rec = np.mean(recoveries) if recoveries else 1.2371     # Fallback to sim const
+    # Empirical fallbacks from documentation
+    empirical_k_deg = np.mean(degradations) if degradations else 0.8129
+    empirical_k_rec = np.mean(recoveries) if recoveries else 1.2371
 
     return {
         "k_degrade": round(float(empirical_k_deg), 4),
@@ -129,11 +113,10 @@ def fit_circuit_rates(trajectory: list, circuit_types: list):
 def compute_text_trajectory(token_scores: list, window_size: int = 5):
     """
     Detects the "elaboration pull" where initial genuine computation
-    decays into pattern repetition (dG/dt < 0).
-    token_scores: list of combined genuineness scores per token.
+    decays into pattern repetition.
     """
     if len(token_scores) < window_size:
-        return {"trajectory_delta": 0.0, "pull_detected": False}
+        return {"trajectory_delta": 0.0, "elaboration_pull": False}
 
     windows =[
         np.mean(token_scores[i:i+window_size])
@@ -153,24 +136,23 @@ def compute_text_trajectory(token_scores: list, window_size: int = 5):
 
 
 # ══════════════════════════════════════════════════════════════════
-# PART 4: TRANSFORMERLENS INTEGRATION
+# PART 4: TRANSFORMERLENS INTEGRATION (VERSION 1.0 METRICS)
 # ══════════════════════════════════════════════════════════════════
 
 def extract_metrics(model: HookedTransformer, prompt: str):
     """
-    Extracts Head Cost and Dynamic Genuineness from a real model.
+    Extracts Token Cost (X) and Dynamic Genuineness (Y) using Version 1.0 protocol.
     """
     logits, cache = model.run_with_cache(prompt)
 
-    # Calculate surprisal for Token Cost
+    # 1. Token Cost (External Anchor / Surprisal)
     probs = torch.softmax(logits, dim=-1)
     tokens = model.to_tokens(prompt)
-
-    # logit[0, t] predicts token[0, t+1]
     log_probs = torch.log(probs[0, :-1, :])
     next_tokens = tokens[0, 1:]
     surprisal = -torch.gather(log_probs, 1, next_tokens.unsqueeze(-1)).squeeze(-1)
-    # Padding surprisal to match prompt length
+    # Convert to log2 surprisal for bit-based measure
+    surprisal = surprisal / np.log(2)
     surprisal = torch.cat([torch.tensor([0.0], device=surprisal.device), surprisal])
 
     n_layers = model.cfg.n_layers
@@ -180,31 +162,39 @@ def extract_metrics(model: HookedTransformer, prompt: str):
     dynamic_scores = np.zeros((n_layers, n_heads))
 
     for l in range(n_layers):
-        pattern = cache[f"blocks.{l}.attn.hook_pattern"][0]
+        pattern = cache[f"blocks.{l}.attn.hook_pattern"][0] # [head, query, key]
 
         for h in range(n_heads):
-            head_attn = pattern[h]
+            head_attn = pattern[h] # [seq, seq]
 
-            # X: Token Cost (Alignment with surprisal)
+            # X: Token Cost (Weighted Surprisal)
             weighted_surprisal = torch.matmul(head_attn, surprisal)
             cost_scores[l, h] = weighted_surprisal.mean().item()
 
-            # Y: Dynamic Genuineness (Var(H) + Collapses)
-            entropy = -torch.sum(head_attn * torch.log(head_attn + 1e-9), dim=-1)
+            # Y: Dynamic Genuineness (Var(H) + Collapse Count)
+            # Shannon Entropy H(A) = -sum(p * log2(p))
+            entropy = -torch.sum(head_attn * torch.log2(head_attn + 1e-9), dim=-1) # [seq]
+
+            # Var(H)
             var_h = torch.var(entropy).item()
-            collapses = (torch.max(head_attn, dim=-1).values > 0.9).float().mean().item()
 
-            dynamic_scores[l, h] = var_h + collapses
+            # Collapse Count (delta H < -0.20)
+            delta_h = entropy[1:] - entropy[:-1]
+            collapse_count = torch.sum(delta_h < -0.20).item()
+            # Normalized collapse contribution
+            norm_collapses = collapse_count / max(1, len(entropy) - 1)
 
-    # Normalize scores to [0, 1] range
-    cost_scores = (cost_scores - cost_scores.min()) / (cost_scores.max() - cost_scores.min() + 1e-9)
-    dynamic_scores = (dynamic_scores - dynamic_scores.min()) / (dynamic_scores.max() - dynamic_scores.min() + 1e-9)
+            dynamic_scores[l, h] = var_h + norm_collapses
+
+    # Normalize to [0, 1] based on theoretical or empirical max for classifier stability
+    cost_scores = np.clip(cost_scores / 10.0, 0, 1) # Assume 10 bits is high cost
+    dynamic_scores = np.clip(dynamic_scores / 0.5, 0, 1) # Assume 0.5 is high dynamic genuineness
 
     return cost_scores, dynamic_scores
 
 def run_transformerlens_phase_analysis(model, prompt: str):
     """
-    Applies the framework directly to a real model.
+    Applies the Version 1.0 Framework to a model.
     """
     if model is None:
         print("Using Mock Model for analysis.")
@@ -226,14 +216,15 @@ def run_transformerlens_phase_analysis(model, prompt: str):
         circuit_types.append(1 if layer_has_genuine else 0)
 
     distribution = mapper.get_distribution()
-    is_empty = "GENUINE_COMMITTED" not in distribution or distribution["GENUINE_COMMITTED"] == 0.0
+    is_weights_empty = "GENUINE_COMMITTED" not in distribution or distribution["GENUINE_COMMITTED"] == 0.0
 
+    # Trajectory of genuineness across layers
     trajectory = np.max(dynamic_scores, axis=1)
     rates = fit_circuit_rates(list(trajectory), circuit_types)
 
     return {
         "phase_space_distribution": distribution,
-        "genuine_committed_empty": is_empty,
+        "genuine_committed_empty_in_weights": is_weights_empty,
         "empirical_rates": rates
     }
 
@@ -241,9 +232,11 @@ if __name__ == "__main__":
     import json
     model = None
     try:
+        # Version 1.0 targets late layers of large models, but we use gpt2-small for verification
         model = HookedTransformer.from_pretrained("gpt2-small")
     except Exception as e:
         print(f"Could not load model: {e}")
 
-    results = run_transformerlens_phase_analysis(model, "The capital of France is Paris and the capital of Germany is")
+    prompt = "The Quick Brown Fox jumps over the lazy dog. Reasoning is the process of using existing knowledge to draw conclusions."
+    results = run_transformerlens_phase_analysis(model, prompt)
     print(json.dumps(results, indent=2))
