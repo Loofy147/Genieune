@@ -1,0 +1,12 @@
+*.zip
+*.log
+__pycache__/
+*.pyc
+test_output.log
+test_stdout.log
+test_stderr.log
+test_log.txt
+test_results.log
+test_out
+test_err
+unittest_err.log
