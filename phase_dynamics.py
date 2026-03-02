@@ -1,3 +1,16 @@
+import os
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+try:
+    import transformer_lens
+except ImportError:
+    install("transformer-lens")
+    import transformer_lens
+
 """
 PHASE SPACE AND DIFFERENTIAL DYNAMICS FRAMEWORK
 Built strictly from the empirical constants of the simulation data.
