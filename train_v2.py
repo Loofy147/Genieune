@@ -26,7 +26,7 @@ def train():
         return data, target
 
     # 3. Training Loop
-    for epoch in range(1, 51):
+    for epoch in range(1, 201):
         model.train()
         data, target = get_batch()
 
@@ -50,7 +50,7 @@ def train():
         total_loss.backward()
         optimizer.step()
 
-        if epoch % 10 == 0:
+        if epoch % 20 == 0:
             print(f"Epoch {epoch} | Task: {task_loss.item():.4f} | Thermo: {thermo_loss.item():.4f}")
 
     print("Training Complete.")
