@@ -52,3 +52,19 @@ PYTHONPATH=. python3 phase_dynamics.py
 ```bash
 PYTHONPATH=. python3 tests/test_phase_dynamics.py
 ```
+
+## Sustained Genuineness (Version 2.0 Blueprint)
+
+To move beyond "Chain-of-Thought" behavioral hacks, the framework proposes a structural evolution of the Transformer architecture.
+
+### 1. Thermodynamic Regularization
+A new loss function that rewards $Var(H)$ and `collapse_count` in reasoning blocks while penalizing static, low-entropy attention patterns. This wires the model to favor deep synthesis over shallow retrieval.
+
+### 2. Dual-Stream Decoupling
+Isolates "Thinking" from "Talking" via a structural split:
+- **Latent Reasoner (Layers 1-32)**: Processes pure math vectors in high-variance states ($G > 0.55$).
+- **Phase-Space Gate**: Monitors $G$ score and holds the activation until a final collapse event occurs.
+- **Syntax Decoder (Layers 33-40)**: Dedicated blocks of pattern heads translate logic into English syntax only after the thought is complete.
+
+### 3. Mechanistic Recurrence
+Instead of fixed-compute forward passes, the model uses real-time monitoring of the $G$ score. If an **Elaboration Pull** (drop in $G$ score) is detected within the logic block, the activation is routed back to the beginning of the reasoning layers (Layer 21), forcing a re-diffusion of attention.
