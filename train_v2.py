@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.getcwd())
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -11,6 +14,8 @@ Optimizing for Sustained Genuineness using Differentiable Thermodynamic Regulari
 """
 
 def train():
+    print(f'Current working directory: {os.getcwd()}')
+    print(f'Files in directory: {os.listdir(os.getcwd())}')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Training on {device}")
 
