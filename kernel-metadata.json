@@ -1,7 +1,7 @@
 {
   "id": "hichambedrani/phase-dynamics-analysis",
   "title": "Phase Dynamics Analysis",
-  "code_file": "phase_dynamics.py",
+  "code_file": "kaggle_analysis.py",
   "language": "python",
   "kernel_type": "script",
   "is_private": "true",

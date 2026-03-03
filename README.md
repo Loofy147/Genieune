@@ -48,12 +48,9 @@ The framework models the "Elaboration Pull"—the decay of genuine computation i
 PYTHONPATH=. python3 phase_dynamics.py
 ```
 
-## Testing
-```bash
-PYTHONPATH=. python3 tests/test_phase_dynamics.py
-```
+## Sustained Genuineness (Version 2.0 Architectural Blueprint)
 
-## Sustained Genuineness (Version 2.0 Blueprint)
+*Note: Version 2.0 components are currently implemented as architectural simulations and prototypes.*
 
 To move beyond "Chain-of-Thought" behavioral hacks, the framework proposes a structural evolution of the Transformer architecture.
 
@@ -68,3 +65,9 @@ Isolates "Thinking" from "Talking" via a structural split:
 
 ### 3. Mechanistic Recurrence
 Instead of fixed-compute forward passes, the model uses real-time monitoring of the $G$ score. If an **Elaboration Pull** (drop in $G$ score) is detected within the logic block, the activation is routed back to the beginning of the reasoning layers (Layer 21), forcing a re-diffusion of attention.
+
+## Testing
+```bash
+PYTHONPATH=. python3 tests/test_phase_dynamics.py
+PYTHONPATH=. python3 tests/test_v2_prototypes.py
+```
