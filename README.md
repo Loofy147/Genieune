@@ -71,3 +71,16 @@ Instead of fixed-compute forward passes, the model uses real-time monitoring of 
 PYTHONPATH=. python3 tests/test_phase_dynamics.py
 PYTHONPATH=. python3 tests/test_v2_prototypes.py
 ```
+
+### Training the V2 Architecture
+The repository includes a functional prototype of the **GenuineTransformer** and a training pipeline.
+
+#### 1. Components
+- `genuine_model.py`: The architecture definition with reasoning and syntax streams.
+- `train_v2.py`: The training loop implementing **Thermodynamic Regularization**.
+
+#### 2. Run Training
+```bash
+PYTHONPATH=. python3 train_v2.py
+```
+This script trains the model on a synthetic reasoning task while applying a mechanistic penalty for static attention states, structurally forcing the model to stay in a "Genuine State."

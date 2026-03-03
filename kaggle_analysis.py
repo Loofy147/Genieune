@@ -23,6 +23,8 @@ def convert_to_serializable(obj):
         return {k: convert_to_serializable(v) for k, v in obj.items()}
     if isinstance(obj, list):
         return [convert_to_serializable(item) for item in obj]
+    if isinstance(obj, torch.Tensor):
+        return obj.detach().cpu().tolist()
     return obj
 
 def run_comprehensive_analysis(prompt: str):
@@ -55,16 +57,15 @@ def run_comprehensive_analysis(prompt: str):
     initial_g = results_v1["trajectory_analysis"].get("start_G", 0.4)
     results_v2 = simulator.forward(initial_state=initial_g)
 
-    # 4. Thermodynamic Loss Calculation
+    # 4. Thermodynamic Loss Calculation (Prototype)
     regularizer = ThermodynamicRegularizer()
-    mock_dynamic = np.random.rand(12, 12)
-    mock_trajectories = [np.random.rand(5) for _ in range(5)]
-    v2_loss = regularizer.calculate_loss(mock_dynamic, mock_trajectories)
+    mock_entropies = [torch.rand(1, 10) for _ in range(4)]
+    v2_loss = regularizer.calculate_loss(mock_entropies)
 
     comprehensive_results = {
         "v1_interpretability": results_v1,
         "v2_architecture_simulation": results_v2,
-        "v2_thermodynamic_loss_sample": v2_loss
+        "v2_thermodynamic_loss_sample": float(v2_loss)
     }
 
     return convert_to_serializable(comprehensive_results)
