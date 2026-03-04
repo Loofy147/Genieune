@@ -1,7 +1,7 @@
 {
-  "id": "hichambedrani/phase-dynamics-training",
-  "title": "Phase Dynamics Training",
-  "code_file": "train_v2.py",
+  "id": "hichambedrani/genuine-transformer-v2-advanced",
+  "title": "Genuine Transformer V2.1 Advanced Training",
+  "code_file": "train_v2_advanced.py",
   "language": "python",
   "kernel_type": "script",
   "is_private": "true",

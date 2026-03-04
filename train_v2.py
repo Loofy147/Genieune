@@ -8,12 +8,12 @@ import numpy as np
 from typing import Dict, List, Tuple
 
 """
-DYNAMIC ENTROPY GENUINENESS FRAMEWORK (Version 2.0 Prototype)
-Consolidated into a single file for Kaggle execution.
+DYNAMIC ENTROPY GENUINENESS FRAMEWORK (Version 2.0 Consolidated)
+Self-contained script for Kaggle execution with extended training duration.
 """
 
 # ══════════════════════════════════════════════════════════════════
-# PART 1: GENUINE TRANSFORMER ARCHITECTURE (formerly genuine_model.py)
+# PART 1: GENUINE TRANSFORMER ARCHITECTURE
 # ══════════════════════════════════════════════════════════════════
 
 class GenuineAttentionHead(nn.Module):
@@ -68,7 +68,7 @@ class GenuineLayer(nn.Module):
         return x, attn_weights, entropies
 
 class GenuineTransformer(nn.Module):
-    def __init__(self, d_model=256, n_heads=8, n_reasoner_layers=4, n_decoder_layers=2, vocab_size=1000):
+    def __init__(self, d_model=128, n_heads=4, n_reasoner_layers=2, n_decoder_layers=2, vocab_size=1000):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, d_model)
         self.reasoner = nn.ModuleList([GenuineLayer(d_model, n_heads) for _ in range(n_reasoner_layers)])
@@ -86,6 +86,7 @@ class GenuineTransformer(nn.Module):
                 loop_entropies.append(entropies)
 
                 if use_recurrence and loop < max_loops - 1:
+                    # Detect Elaboration Pull (Simplified G check)
                     layer_g = torch.stack([torch.var(e, dim=-1).mean() for e in entropies]).mean()
 
             all_entropies.extend(loop_entropies)
@@ -99,7 +100,7 @@ class GenuineTransformer(nn.Module):
         return logits, all_entropies
 
 # ══════════════════════════════════════════════════════════════════
-# PART 2: THERMODYNAMIC REGULARIZER (formerly sustained_genuineness.py)
+# PART 2: THERMODYNAMIC REGULARIZER
 # ══════════════════════════════════════════════════════════════════
 
 class ThermodynamicRegularizer:
@@ -110,8 +111,11 @@ class ThermodynamicRegularizer:
     def calculate_loss(self, entropies: List[torch.Tensor]) -> torch.Tensor:
         total_loss = torch.tensor(0.0, device=entropies[0].device)
         for head_ent in entropies:
+            # Variance Reward
             var_h = torch.var(head_ent, dim=-1).mean()
             total_loss = total_loss - 0.5 * var_h
+
+            # Static Penalty
             mean_h = head_ent.mean()
             if mean_h < self.mechanical_threshold:
                 total_loss = total_loss + torch.pow(self.mechanical_threshold - mean_h, 2)
@@ -122,8 +126,6 @@ class ThermodynamicRegularizer:
 # ══════════════════════════════════════════════════════════════════
 
 def train():
-    print(f'Current working directory: {os.getcwd()}')
-    print(f'Files in directory: {os.listdir(os.getcwd())}')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Training on {device}")
 
@@ -138,8 +140,9 @@ def train():
         target = (data + 1) % 1000
         return data, target
 
-    # 3. Training Loop
-    for epoch in range(1, 201):
+    # 3. Training Loop (Significantly extended duration)
+    n_epochs = 5000
+    for epoch in range(1, n_epochs + 1):
         model.train()
         data, target = get_batch()
 
@@ -162,8 +165,8 @@ def train():
         total_loss.backward()
         optimizer.step()
 
-        if epoch % 20 == 0:
-            print(f"Epoch {epoch} | Task: {task_loss.item():.4f} | Thermo: {thermo_loss.item():.4f}")
+        if epoch % 250 == 0:
+            print(f"Epoch {epoch}/{n_epochs} | Task Loss: {task_loss.item():.4f} | Thermo Loss: {thermo_loss.item():.4f}")
 
     print("Training Complete.")
     torch.save(model.state_dict(), "genuine_model_v2.pt")
