@@ -1,0 +1,10 @@
+{
+  "ownerSlug": "hichambedrani",
+  "title": "Dynamic Entropy Genuineness Framework V2.1",
+  "slug": "dynamic-entropy-genuineness-v2-1",
+  "subtitle": "Structural evolution of Transformers via Thermodynamic Regularization and Recurrence.",
+  "isPrivate": false,
+  "description": "# Dynamic Entropy Genuineness Framework (Version 2.1 Refined)\n\nThis model implements a structural evolution of the Transformer architecture, moving beyond simple 'Chain-of-Thought' behavioral hacks towards internal, mechanistic reasoning.\n\n## Core Innovations\n\n### 1. Dynamic Genuineness (G-score)\nInstead of relying on token prediction accuracy alone, this framework evaluates model states using the **G-score**—a metric derived from the **Shannon Entropy variance** of attention patterns. High G-scores indicate genuine synthesis and reasoning, while low G-scores indicate mechanical pattern matching.\n\n### 2. Mechanistic Recurrence & Elaboration Pull Detection\nThe **Genuine Transformer** (V2.1) architecture features a real-time monitoring system in its forward pass. If it detects an 'Elaboration Pull' (a sudden drop in attention complexity), the state is dynamically routed back through reasoning layers to sustain its computational depth.\n\n### 3. Thermodynamic Regularization\nA custom loss function designed to 'wire' the model for reasoning by rewarding high-variance attention states and penalizing premature entropy collapse.\n\n## Model Characteristics\n- **Architecture**: Genuine Transformer (V2.1 Refined)\n- **Embeddings**: Rotary Positional Embeddings (RoPE)\n- **Layers**: 4 Layers (2 Reasoner, 2 Decoder)\n- **Recurrence**: Dynamic reasoning loops (max_loops=3)\n- **Vocab Size**: 1000 tokens\n\n## Training Data\n- **Task**: Complex Multi-Step Parity Logic\n- **Objective**: Structural sustainment of high-variance attention states.\n\n## Usage\nThis model is designed to be used with the `genuine_model.py` and `kaggle_analysis.py` scripts included in the associated Kaggle Kernel.\n",
+  "publishTime": "",
+  "provenanceSources": ""
+}
