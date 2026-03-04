@@ -5,9 +5,9 @@ import numpy as np
 from typing import Dict, List, Tuple
 
 """
-DYNAMIC ENTROPY GENUINENESS FRAMEWORK (Version 2.1)
+DYNAMIC ENTROPY GENUINENESS FRAMEWORK (Version 2.1 Refined)
 Full Version: Includes Rotary Positional Embeddings (RoPE),
-Mechanistic Recurrence, and Thermodynamic Regularization.
+Mechanistic Recurrence (Elaboration Routing), and Thermodynamic Regularization.
 """
 
 # ══════════════════════════════════════════════════════════════════
@@ -57,7 +57,7 @@ class GenuineAttention(nn.Module):
         attn_scores = torch.einsum("bihd,bjhd->bihj", q, k) / np.sqrt(self.head_dim)
         attn_weights = F.softmax(attn_scores, dim=-1)
 
-        # Entropy Monitoring
+        # Entropy Monitoring (Shannon Entropy H(A))
         entropy = -torch.sum(attn_weights * torch.log2(attn_weights + 1e-9), dim=-1)
 
         out = torch.einsum("bihj,bjhd->bihd", attn_weights, v)
@@ -91,23 +91,32 @@ class GenuineTransformer(nn.Module):
         self.fc_out = nn.Linear(d_model, vocab_size)
         self.freqs_cis = precompute_freqs_cis(d_model // n_heads, 128)
 
-    def forward(self, x, g_threshold=0.6, max_loops=2):
+    def forward(self, x, g_threshold=0.6, max_loops=3):
         x = self.embedding(x)
         all_entropies = []
         reasoning_layers = len(self.layers) // 2
 
+        g_history = []
         for loop in range(max_loops):
             loop_entropies = []
             for i in range(reasoning_layers):
                 x, attn, entropies = self.layers[i](x, self.freqs_cis)
                 loop_entropies.append(entropies)
 
-            # G-score: Variance of attention entropy
+            # G-score: Variance of attention entropy (Mean across heads and sequence)
             current_g = torch.stack([torch.var(e, dim=-1).mean() for e in loop_entropies]).mean()
             all_entropies.extend(loop_entropies)
+            g_history.append(float(current_g.detach()))
 
+            # Dynamic routing: Stop if thought is sustained high genuineness
             if current_g >= g_threshold:
                 break
+
+            # Elaboration Pull Check: If G-score dropped significantly, loop to stabilize
+            if len(g_history) >= 2:
+                delta_g = g_history[-1] - g_history[-2]
+                if delta_g < -0.15: # Pull detected
+                    continue # Try another reasoning pass
 
         for i in range(reasoning_layers, len(self.layers)):
             x, attn, entropies = self.layers[i](x, self.freqs_cis)
@@ -121,18 +130,33 @@ class GenuineTransformer(nn.Module):
 # ══════════════════════════════════════════════════════════════════
 
 class ThermodynamicRegularizer:
-    def __init__(self, target_g=0.65, mechanical_penalty=0.4):
+    def __init__(self, target_g=0.65, mechanical_penalty=0.4, collapse_penalty=5.0):
         self.target_g = target_g
         self.mechanical_penalty = mechanical_penalty
+        self.collapse_penalty = collapse_penalty
 
     def calculate_loss(self, entropies: List[torch.Tensor]) -> torch.Tensor:
         total_loss = torch.tensor(0.0, device=entropies[0].device)
+
+        # Track previous entropy mean to penalize collapse
+        prev_mean_h = None
+
         for head_ent in entropies:
+            # 1. Variance Reward (Sustain internal complexity)
             var_h = torch.var(head_ent, dim=-1).mean()
             total_loss = total_loss - 1.0 * var_h
 
+            # 2. Static Penalty (Avoid prolonged low entropy)
             mean_h = head_ent.mean()
             if mean_h < self.mechanical_penalty:
-                total_loss = total_loss + torch.pow(self.mechanical_penalty - mean_h, 2) * 5.0
+                total_loss = total_loss + torch.pow(self.mechanical_penalty - mean_h, 2) * self.collapse_penalty
+
+            # 3. Collapse Penalty (Penalize sudden drop in entropy between layers)
+            if prev_mean_h is not None:
+                delta_h = mean_h - prev_mean_h
+                if delta_h < -0.2: # Significant collapse
+                    total_loss = total_loss + torch.pow(delta_h, 2) * self.collapse_penalty
+
+            prev_mean_h = mean_h
 
         return total_loss

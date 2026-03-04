@@ -11,6 +11,7 @@ from torch.optim.lr_scheduler import OneCycleLR
 """
 DYNAMIC ENTROPY GENUINENESS FRAMEWORK (Version 2.1 Advanced Training)
 Self-contained script for Kaggle with RoPE, Recurrence, and Thermo-Regularization.
+Refined Version: Complex Multi-Step Parity Task.
 """
 
 # ══════════════════════════════════════════════════════════════════
@@ -90,23 +91,28 @@ class GenuineTransformer(nn.Module):
         self.fc_out = nn.Linear(d_model, vocab_size)
         self.freqs_cis = precompute_freqs_cis(d_model // n_heads, 128)
 
-    def forward(self, x, g_threshold=0.6, max_loops=2):
+    def forward(self, x, g_threshold=0.6, max_loops=3):
         x = self.embedding(x)
         all_entropies = []
         reasoning_layers = len(self.layers) // 2
 
+        g_history = []
         for loop in range(max_loops):
             loop_entropies = []
             for i in range(reasoning_layers):
                 x, attn, entropies = self.layers[i](x, self.freqs_cis)
                 loop_entropies.append(entropies)
 
-            # G-score: Variance of attention entropy
             current_g = torch.stack([torch.var(e, dim=-1).mean() for e in loop_entropies]).mean()
             all_entropies.extend(loop_entropies)
+            g_history.append(float(current_g.detach()))
 
             if current_g >= g_threshold:
                 break
+
+            if len(g_history) >= 2:
+                delta_g = g_history[-1] - g_history[-2]
+                if delta_g < -0.15: continue
 
         for i in range(reasoning_layers, len(self.layers)):
             x, attn, entropies = self.layers[i](x, self.freqs_cis)
@@ -116,19 +122,27 @@ class GenuineTransformer(nn.Module):
         return logits, all_entropies
 
 class ThermodynamicRegularizer:
-    def __init__(self, target_g=0.65, mechanical_penalty=0.4):
-        self.target_g = target_g
+    def __init__(self, mechanical_penalty=0.4, collapse_penalty=5.0):
         self.mechanical_penalty = mechanical_penalty
+        self.collapse_penalty = collapse_penalty
 
     def calculate_loss(self, entropies: List[torch.Tensor]) -> torch.Tensor:
         total_loss = torch.tensor(0.0, device=entropies[0].device)
+        prev_mean_h = None
+
         for head_ent in entropies:
             var_h = torch.var(head_ent, dim=-1).mean()
             total_loss = total_loss - 1.0 * var_h
 
             mean_h = head_ent.mean()
             if mean_h < self.mechanical_penalty:
-                total_loss = total_loss + torch.pow(self.mechanical_penalty - mean_h, 2) * 5.0
+                total_loss = total_loss + torch.pow(self.mechanical_penalty - mean_h, 2) * self.collapse_penalty
+
+            if prev_mean_h is not None:
+                delta_h = mean_h - prev_mean_h
+                if delta_h < -0.2:
+                    total_loss = total_loss + torch.pow(delta_h, 2) * self.collapse_penalty
+            prev_mean_h = mean_h
 
         return total_loss
 
@@ -138,27 +152,27 @@ class ThermodynamicRegularizer:
 
 def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Training Advanced V2.1 on {device}")
+    print(f"Training Refined V2.1 on {device}")
 
-    # Configuration
     batch_size = 16
     seq_len = 16
     n_epochs = 10000
     vocab_size = 1000
 
-    # Initialize
     model = GenuineTransformer(d_model=128, n_heads=4, n_layers=4, vocab_size=vocab_size).to(device)
     regularizer = ThermodynamicRegularizer()
 
-    # Optimizer & Scheduler
     optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-2)
     scheduler = OneCycleLR(optimizer, max_lr=1e-3, steps_per_epoch=1, epochs=n_epochs)
     criterion = nn.CrossEntropyLoss()
 
     def get_complex_batch():
-        # Task: Selective Reversal and Increment
+        # Task: Multi-Step Selective Logic
+        # 1. Base token T
+        # 2. If T % 2 == 0, Target = (T * 2 + 1) % vocab_size
+        # 3. If T % 2 != 0, Target = (T // 2 - 1) % vocab_size
         data = torch.randint(10, 900, (batch_size, seq_len)).to(device)
-        target = torch.where(data % 2 == 0, (data + 1) % vocab_size, (data - 1) % vocab_size)
+        target = torch.where(data % 2 == 0, (data * 2 + 1) % vocab_size, (data // 2 - 1) % vocab_size)
         return data, target
 
     for epoch in range(1, n_epochs + 1):
@@ -180,7 +194,7 @@ def train():
         if epoch % 500 == 0:
             print(f"Epoch {epoch}/{n_epochs} | Task: {task_loss.item():.4f} | Thermo: {thermo_loss.item():.4f} | LR: {scheduler.get_last_lr()[0]:.6f}")
 
-    print("Advanced Training Complete.")
+    print("Refined Training Complete.")
     torch.save(model.state_dict(), "advanced_genuine_model_v2_1.pt")
 
 if __name__ == "__main__":
