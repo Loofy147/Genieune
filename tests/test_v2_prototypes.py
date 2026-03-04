@@ -1,9 +1,10 @@
 import unittest
 import torch
 import numpy as np
-from sustained_genuineness import ThermodynamicRegularizer, DualStreamSimulator, MechanisticRecurrence
+from genuine_model import GenuineTransformer, ThermodynamicRegularizer
+from sustained_genuineness import MechanisticRecurrence
 
-class TestV2Prototypes(unittest.TestCase):
+class TestV2FullVersion(unittest.TestCase):
     def test_regularizer(self):
         reg = ThermodynamicRegularizer()
         # Mock entropies [head][batch, seq]
@@ -11,18 +12,21 @@ class TestV2Prototypes(unittest.TestCase):
         loss = reg.calculate_loss(entropies)
         self.assertTrue(torch.is_tensor(loss))
 
-    def test_dual_stream(self):
-        sim = DualStreamSimulator()
-        result = sim.forward(initial_state=0.4, max_loops=10)
-        self.assertIn("final_g", result)
-        self.assertIn("loops_in_reasoner", result)
-        self.assertGreater(result["loops_in_reasoner"], 0)
+    def test_genuine_transformer_forward(self):
+        model = GenuineTransformer(d_model=64, n_heads=4, n_layers=2, vocab_size=100)
+        x = torch.randint(0, 100, (1, 10))
+        # Set g_threshold very high to force max_loops
+        logits, entropies = model(x, g_threshold=10.0, max_loops=2)
+
+        self.assertEqual(logits.shape, (1, 10, 100))
+        # 1 reasoner layer * 2 loops + 1 decoder layer = 3 entropy tensors
+        self.assertEqual(len(entropies), 3)
 
     def test_recurrence_trigger(self):
-        recur = MechanisticRecurrence(recurrence_layer=21)
-        self.assertFalse(recur.check_and_route(25, [0.6, 0.7]))
-        self.assertTrue(recur.check_and_route(25, [0.7, 0.4]))
-        self.assertFalse(recur.check_and_route(10, [0.7, 0.4]))
+        recur = MechanisticRecurrence(recurrence_layer=5)
+        self.assertFalse(recur.check_and_route(10, [0.6, 0.7]))
+        self.assertTrue(recur.check_and_route(10, [0.7, 0.4]))
+        self.assertFalse(recur.check_and_route(2, [0.7, 0.4]))
 
 if __name__ == "__main__":
     unittest.main()
