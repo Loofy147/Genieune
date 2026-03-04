@@ -1,86 +1,82 @@
-# Dynamic Entropy Genuineness Framework (Version 1.0)
+# Dynamic Entropy Genuineness Framework (Version 2.1 Refined)
 
-This repository implements the **Dynamic Entropy Genuineness Framework**, a mechanistic interpretability approach for analyzing Transformer models. The framework maps attention heads into a 2D Phase Space to distinguish between mechanical pattern matching and genuine computation.
+This repository implements the **Dynamic Entropy Genuineness Framework**, a mechanistic interpretability and architectural evolution approach for analyzing and training Transformers. The framework uses a 2D Phase Space to distinguish between mechanical pattern matching and genuine computation.
 
 ## Core Metrics
 
-The framework evaluates attention heads using two primary axes:
+The framework evaluates attention heads and model trajectories using two primary axes:
 
 ### 1. Token Cost (X-Axis)
 Represents the "external anchor" or the information density being processed.
 - **Definition**: Weighted average surprisal of the tokens attended to by the head.
 - **Surprisal**: $I(t) = -\log_2 P(t)$
-- **Calculation**: $X_{head} = \sum_{i,j} A_{i,j} \cdot I(j)$, where $A$ is the attention pattern.
+- **Calculation**: $X_{head} = \sum_{i,j} A_{i,j} \cdot I(j)$
 
-### 2. Dynamic Genuineness (Y-Axis)
-Measures the internal complexity and "collapse" dynamics of the head's attention.
-- **Definition**: $Y = \text{Var}(H) + \frac{\text{Collapse Count}}{L}$
+### 2. Dynamic Genuineness (Y-Axis / G-score)
+Measures the internal complexity and attention variance.
+- **Definition**: $Y = \text{Var}(H) + \text{Collapse Count} / L$
 - **Shannon Entropy (H)**: $H(i) = -\sum_j A_{i,j} \log_2(A_{i,j})$
-- **Collapse Event**: A sudden drop in entropy between adjacent tokens, $\Delta H < -0.20$.
+- **Collapse Event**: Sudden drop in entropy between layers or tokens, $\Delta H < -0.20$.
 
-## Phase Space Quadrants
+## Full Version 2.1 Implementation
 
-| Quadrant | Thresholds | Typical Archetype |
-| :--- | :--- | :--- |
-| **GENUINE_DIFFUSE** | $Y \ge 0.55, X < 0.5$ | Name Mover Heads (Logic Engines) |
-| **MECHANICAL_COMMITTED** | $Y \le 0.35, X \ge 0.5$ | Induction Heads (Pattern Retrieval) |
-| **MECHANICAL_DIFFUSE** | $Y \le 0.35, X < 0.5$ | Broadcast / Uniform Attention |
-| **GENUINE_COMMITTED** | $Y \ge 0.55, X \ge 0.5$ | Rare in trained weights (High cost logic) |
+The repository has transitioned from simulations to a functional **Genuine Transformer** (V2.1) architecture with the following features:
 
-## Differential Dynamics (Circuit Asymmetry)
+### 1. Rotary Positional Embeddings (RoPE)
+Integrated relative positional encoding for enhanced sequence modeling and attention stability.
 
-The framework models the "Elaboration Pull"—the decay of genuine computation into pattern repetition—using empirical differential equations:
+### 2. Mechanistic Recurrence (Dynamic Routing)
+The model monitors the **G-score** (entropy variance) in real-time during the forward pass.
+- **Elaboration Pull Detection**: If the G-score drops significantly between reasoning layers, the hidden state is routed back through the reasoning block to "re-diffuse" attention and stabilize the thought.
+- **Dynamic Exit**: The model exits the reasoning loop once a sustained high G-score threshold is met.
 
-- **Degradation (Pattern pull)**: $\frac{dG}{dt} = -0.8129 \cdot G$
-- **Recovery (Genuine computation)**: $\frac{dG}{dt} = +1.2371 \cdot (G_{max} - G)$
+### 3. Thermodynamic Regularization
+An advanced loss function that:
+- Rewards **high attention variance** (internal complexity).
+- Penalizes **static, low-entropy states** (mechanical pattern matching).
+- Penalizes **premature entropy collapse** between layers.
+
+## Repository Structure
+
+- `genuine_model.py`: Core architecture (Version 2.1) including RoPE, Recurrence, and the Regularizer.
+- `sustained_genuineness.py`: Logic utilities for G-score tracking and routing.
+- `kaggle_analysis.py`: Full analysis pipeline. Evaluates prompts using V1 interpretability and V2.1 model metrics.
+- `train_v2_advanced.py`: Advanced training pipeline for V2.1 models on complex reasoning tasks.
+- `phase_dynamics.py`: Original V1 mechanistic interpretability tools.
+- `AGENTS.md`: Technical instructions and codebase overview.
 
 ## Installation & Usage
 
 ### Dependencies
-- `transformer-lens`
-- `torch`
-- `numpy`
-- `scipy`
-- `matplotlib`
+- `transformer-lens`, `torch`, `numpy`, `scipy`, `matplotlib`
 
 ### Running Analysis
 ```bash
-PYTHONPATH=. python3 phase_dynamics.py
+python3 kaggle_analysis.py
 ```
+This script evaluates a prompt, generates Phase Space plots for GPT-2 (V1), and runs the refined V2.1 model to track its G-trajectory and thermodynamic loss.
 
-## Sustained Genuineness (Version 2.0 Architectural Blueprint)
-
-*Note: Version 2.0 components are currently implemented as architectural simulations and prototypes.*
-
-To move beyond "Chain-of-Thought" behavioral hacks, the framework proposes a structural evolution of the Transformer architecture.
-
-### 1. Thermodynamic Regularization
-A new loss function that rewards $Var(H)$ and `collapse_count` in reasoning blocks while penalizing static, low-entropy attention patterns. This wires the model to favor deep synthesis over shallow retrieval.
-
-### 2. Dual-Stream Decoupling
-Isolates "Thinking" from "Talking" via a structural split:
-- **Latent Reasoner (Layers 1-32)**: Processes pure math vectors in high-variance states ($G > 0.55$).
-- **Phase-Space Gate**: Monitors $G$ score and holds the activation until a final collapse event occurs.
-- **Syntax Decoder (Layers 33-40)**: Dedicated blocks of pattern heads translate logic into English syntax only after the thought is complete.
-
-### 3. Mechanistic Recurrence
-Instead of fixed-compute forward passes, the model uses real-time monitoring of the $G$ score. If an **Elaboration Pull** (drop in $G$ score) is detected within the logic block, the activation is routed back to the beginning of the reasoning layers (Layer 21), forcing a re-diffusion of attention.
-
-## Testing
+### Running Tests
 ```bash
-PYTHONPATH=. python3 tests/test_phase_dynamics.py
-PYTHONPATH=. python3 tests/test_v2_prototypes.py
+PYTHONPATH=. python3 -m unittest discover tests
 ```
 
-### Training the V2 Architecture
-The repository includes a functional prototype of the **GenuineTransformer** and a training pipeline.
-
-#### 1. Components
-- `genuine_model.py`: The architecture definition with reasoning and syntax streams.
-- `train_v2.py`: The training loop implementing **Thermodynamic Regularization**.
-
-#### 2. Run Training
+### Training
 ```bash
-PYTHONPATH=. python3 train_v2.py
+python3 train_v2_advanced.py
 ```
-This script trains the model on a synthetic reasoning task while applying a mechanistic penalty for static attention states, structurally forcing the model to stay in a "Genuine State."
+
+## Kaggle Deployment
+Automated via `deploy_kaggle.sh`. Requires `KAGGLE_API_TOKEN` environment variable and `kaggle` CLI.
+
+## Phase Space Quadrants (V1)
+
+| Quadrant | Typical Archetype |
+| :--- | :--- |
+| **GENUINE_DIFFUSE** | Name Mover Heads (Logic Engines) |
+| **MECHANICAL_COMMITTED** | Induction Heads (Pattern Retrieval) |
+| **MECHANICAL_DIFFUSE** | Broadcast / Uniform Attention |
+| **GENUINE_COMMITTED** | High-cost reasoning (Rare) |
+
+---
+*Developed under the Dynamic Entropy Genuineness Framework (Version 2.1).*
