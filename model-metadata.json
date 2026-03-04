@@ -1,0 +1,8 @@
+{
+  "ownerSlug": "hichambedrani",
+  "title": "Dynamic Entropy Genuineness Framework V2.1",
+  "slug": "dynamic-entropy-genuineness-v2-1",
+  "subtitle": "Structural evolution of Transformers via Thermodynamic Regularization and Recurrence.",
+  "isPrivate": false,
+  "description": "# Model Summary\nThis model implements the Dynamic Entropy Genuineness Framework (Version 2.1 Refined). It uses mechanistic interpretability to distinguish between mechanical pattern matching and genuine computation through G-score monitoring.\n\n# Model Characteristics\n- **Architecture**: Genuine Transformer (V2.1 Refined)\n- **Embeddings**: Rotary Positional Embeddings (RoPE)\n- **Layers**: 4 Layers (2 Reasoner, 2 Decoder)\n- **Recurrence**: Dynamic reasoning loops (max_loops=3)\n- **Vocab Size**: 1000 tokens\n\n# Data Overview\n- **Task**: Complex Multi-Step Parity Logic\n- **Objective**: Structural sustainment of high-variance attention states.\n\n# Evaluation Results\nEvaluated using attention entropy variance (G-score). The model sustains reasoning depth through dynamic recurrence loops when elaboration pull is detected.\n\n# Source & Provenance\n- **Original Author**: hichambedrani\n- **Framework**: Dynamic Entropy Genuineness Framework\n- **Public Notebook**: [Genuine Transformer V2.1 Advanced Training](https://www.kaggle.com/code/hichambedrani/genuine-transformer-v2-advanced)\n\n# Usage\nThis model is designed to be used with the `genuine_model.py` and `kaggle_analysis.py` scripts included in the associated Kaggle Kernel.\n"
+}

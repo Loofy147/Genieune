@@ -1,10 +1,10 @@
 {
   "v1_interpretability": {
     "phase_space_distribution": {
-      "GENUINE_DIFFUSE": 0.8611111111111112,
-      "TRANSITION": 0.04861111111111111,
-      "GENUINE_COMMITTED": 0.05555555555555555,
-      "MECHANICAL_DIFFUSE": 0.034722222222222224
+      "GENUINE_DIFFUSE": 0.8680555555555556,
+      "TRANSITION": 0.020833333333333332,
+      "GENUINE_COMMITTED": 0.06944444444444445,
+      "MECHANICAL_DIFFUSE": 0.041666666666666664
     },
     "archetypes": {
       "Name Mover": [
@@ -38,10 +38,6 @@
         ],
         [
           1,
-          0
-        ],
-        [
-          1,
           1
         ],
         [
@@ -165,10 +161,6 @@
           10
         ],
         [
-          3,
-          11
-        ],
-        [
           4,
           0
         ],
@@ -230,6 +222,10 @@
         ],
         [
           5,
+          5
+        ],
+        [
+          5,
           6
         ],
         [
@@ -327,10 +323,18 @@
         [
           7,
           9
+        ],
+        [
+          7,
+          11
         ],
         [
           8,
           0
+        ],
+        [
+          8,
+          1
         ],
         [
           8,
@@ -518,47 +522,19 @@
       "asymmetry_ratio": 1.522
     }
   },
-  "v2_architecture_simulation": {
-    "final_g": 0.482,
-    "loops_in_reasoner": 1,
-    "trajectory": [
-      {
-        "state": "Thinking",
-        "G": 0.95
-      },
-      {
-        "state": "Talking",
-        "G": 0.873
-      },
-      {
-        "state": "Talking",
-        "G": 0.802
-      },
-      {
-        "state": "Talking",
-        "G": 0.737
-      },
-      {
-        "state": "Talking",
-        "G": 0.677
-      },
-      {
-        "state": "Talking",
-        "G": 0.622
-      },
-      {
-        "state": "Talking",
-        "G": 0.571
-      },
-      {
-        "state": "Talking",
-        "G": 0.525
-      },
-      {
-        "state": "Talking",
-        "G": 0.482
-      }
-    ]
+  "v2_architecture_analysis": {
+    "final_g": 0.001,
+    "g_trajectory": [
+      0.002,
+      0.001,
+      0.002,
+      0.001,
+      0.002,
+      0.0,
+      0.001,
+      0.001
+    ],
+    "total_processing_steps": 8
   },
-  "v2_thermodynamic_loss_sample": -0.1748335361480713
+  "v2_thermodynamic_loss": -0.010372926481068134
 }
