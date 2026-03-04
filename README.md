@@ -80,3 +80,17 @@ Automated via `deploy_kaggle.sh`. Requires `KAGGLE_API_TOKEN` environment variab
 
 ---
 *Developed under the Dynamic Entropy Genuineness Framework (Version 2.1).*
+
+## Roadmap & Implementation Checklist
+
+### 🚀 Roadmap
+- [ ] **V2.2: Advanced Recurrence Control**: Implement adaptive gating for the reasoning loop based on gradient-signal monitoring.
+- [ ] **V3.0: Latent Reasoner Decoupling**: Fully separate the latent reasoning space from the syntax decoder, using a cross-attention bridge.
+- [ ] **Interpretability Suite**: Add support for path-patching and logit lens visualization within the Genuineness Phase Space.
+- [ ] **G-score Stability Optimization**: Refine the Thermodynamic Regularizer to handle longer sequences and prevent training instabilities.
+
+### ✅ Implementation Checklist
+- [ ] **Architecture Check**: Ensure RoPE frequency precomputation matches the target sequence length.
+- [ ] **Training Stability**: Verify the Thermodynamic loss weight ($\lambda$) is tuned to prevent gradient explosion.
+- [ ] **Analysis Validation**: Confirm `kaggle_analysis.py` produces both V1 Phase Space and V2 G-trajectory plots.
+- [ ] **Recurrence Verification**: Test that the `max_loops` parameter is correctly bounded in the model configuration.
