@@ -1,8 +1,9 @@
 {
   "ownerSlug": "hichambedrani",
   "modelSlug": "dynamic-entropy-genuineness-v2-1",
-  "instanceSlug": "PyTorch",
+  "instanceSlug": "v2-1-refined",
   "framework": "PyTorch",
-  "overview": "Refined Version 2.1 Refined Implementation weights with RoPE and Mechanistic Recurrence logic.",
-  "usage": "# Model Format\nPyTorch (.pt) weights file containing the state_dict for the GenuineTransformer architecture.\n\n# Training Data\nComplex Multi-Step Parity Task with vocab_size=1000.\n\n# Model Inputs\n- Tensor of shape (batch_size, seq_len) with token IDs (0-999).\n\n# Model Outputs\n- Logits: (batch_size, seq_len, 1000)\n- Entropies: List of tensors per layer (batch_size, n_heads, seq_len)\n\n# Model Usage\n1. Initialize `GenuineTransformer` from `genuine_model.py`.\n2. Load state_dict from `advanced_genuine_model_v2_1.pt`.\n3. Run inference to observe G-trajectories.\n"
+  "licenseName": "Apache 2.0",
+  "overview": "Refined Version 2.1 Implementation weights with RoPE and Mechanistic Recurrence logic.",
+  "usage": "Use the GenuineTransformer class in genuine_model.py."
 }
