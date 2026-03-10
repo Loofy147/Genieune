@@ -133,22 +133,33 @@ class ThermodynamicRegularizer:
         self.collapse_penalty = collapse_penalty
 
     def calculate_loss(self, entropies: List[torch.Tensor]) -> torch.Tensor:
-        total_loss = torch.tensor(0.0, device=entropies[0].device)
-        prev_mean_h = None
+        if not entropies:
+            return torch.tensor(0.0, device="cpu")
 
-        for head_ent in entropies:
-            var_h = torch.var(head_ent, dim=-1).mean()
-            total_loss = total_loss - 1.0 * var_h
+        # Vectorized calculation: stack is [L, ...]
+        stack = torch.stack(entropies)
 
-            mean_h = head_ent.mean()
-            if mean_h < self.mechanical_penalty:
-                total_loss = total_loss + torch.pow(self.mechanical_penalty - mean_h, 2) * self.collapse_penalty
+        # 1. Variance Reward: Minimize negative variance (maximize variance)
+        # Average over all dimensions except layer (0) and head (-1)
+        var_h = torch.var(stack, dim=-1) # [L, ...]
+        while var_h.dim() > 1:
+            var_h = var_h.mean(dim=-1)
+        total_loss = -var_h.sum()
 
-            if prev_mean_h is not None:
-                delta_h = mean_h - prev_mean_h
-                if delta_h < -0.2:
-                    total_loss = total_loss + torch.pow(delta_h, 2) * self.collapse_penalty
-            prev_mean_h = mean_h
+        # 2. Static Penalty: Avoid prolonged low entropy
+        # means_h is mean per layer [L]
+        means_h = stack
+        while means_h.dim() > 1:
+            means_h = means_h.mean(dim=-1)
+
+        static_diff = self.mechanical_penalty - means_h
+        total_loss += torch.where(static_diff > 0, static_diff.pow(2), torch.zeros_like(static_diff)).sum() * self.collapse_penalty
+
+        # 3. Collapse Penalty: Penalize sudden drop in entropy between layers
+        if len(means_h) > 1:
+            diffs = means_h[1:] - means_h[:-1]
+            collapse_diff = -0.2 - diffs
+            total_loss += torch.where(collapse_diff > 0, collapse_diff.pow(2), torch.zeros_like(collapse_diff)).sum() * self.collapse_penalty
 
         return total_loss
 
