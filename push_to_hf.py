@@ -15,7 +15,11 @@ def push():
         "train_v2_advanced.py",
         "README.md",
         "V2_2_TECHNICAL_REPORT.md",
-        "analysis_results.json"
+        "analysis_results.json",
+        "app.py",
+        "requirements.txt",
+        "phase_dynamics.py",
+        "sustained_genuineness.py"
     ]
 
     print(f"Pushing to {repo_id}...")
@@ -28,6 +32,8 @@ def push():
                 token=token
             )
             print(f"Pushed {file}")
+        else:
+            print(f"Warning: {file} not found.")
 
 if __name__ == "__main__":
     push()
