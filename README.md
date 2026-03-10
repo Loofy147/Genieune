@@ -1,4 +1,11 @@
 ---
+title: Dynamic Entropy Genuineness Framework V2.2
+emoji: 🧠
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+app_file: app.py
+pinned: false
 license: apache-2.0
 language:
 - en
