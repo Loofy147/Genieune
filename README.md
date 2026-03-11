@@ -9,6 +9,7 @@ pinned: false
 license: apache-2.0
 language:
 - en
+python_version: 3.11
 tags:
 - mechanistic-interpretability
 - genuineness
