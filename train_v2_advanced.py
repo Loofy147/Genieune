@@ -150,7 +150,7 @@ class GenuineTransformer(nn.Module):
         return logits, all_entropies
 
 class ThermodynamicRegularizer:
-    def __init__(self, variance_weight=3.0, mechanical_penalty=0.45, collapse_penalty=10.0, layer_decay=0.92):
+    def __init__(self, variance_weight=15.0, mechanical_penalty=0.45, collapse_penalty=10.0, layer_decay=0.92):
         self.variance_weight = variance_weight
         self.mechanical_penalty = mechanical_penalty
         self.collapse_penalty = collapse_penalty
@@ -227,7 +227,7 @@ def train():
         task_loss = criterion(logits.view(-1, vocab_size), target.view(-1))
         thermo_loss = regularizer.calculate_loss(entropies)
 
-        total_loss = task_loss + 0.25 * thermo_loss
+        total_loss = task_loss + 1.2 * thermo_loss
 
         total_loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)

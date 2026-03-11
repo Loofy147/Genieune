@@ -1,6 +1,6 @@
 {
   "id": "hichambedrani/genuine-transformer-v2-advanced",
-  "title": "Genuine Transformer V2.2 Advanced Training",
+  "title": "Genuine Transformer V2.2 Scaled Training V2",
   "code_file": "train_v2_advanced.py",
   "language": "python",
   "kernel_type": "script",
