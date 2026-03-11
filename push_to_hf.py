@@ -22,7 +22,8 @@ def push():
         "requirements.txt",
         "phase_dynamics.py",
         "sustained_genuineness.py",
-        "advanced_genuine_model_v2_1.pt"
+        "advanced_genuine_model_v2_1.pt",
+        "advanced_genuine_model_v2_2.pt"
     ]
 
     print(f"Pushing to Space: {repo_id}...")
