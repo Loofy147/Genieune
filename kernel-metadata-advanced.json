@@ -1,10 +1,10 @@
 {
   "id": "hichambedrani/genuine-transformer-v2-advanced",
-  "title": "Genuine Transformer V2.1 Advanced Training",
+  "title": "Genuine Transformer V2.2 Advanced Training",
   "code_file": "train_v2_advanced.py",
   "language": "python",
   "kernel_type": "script",
-  "is_private": "true",
+  "is_private": "false",
   "enable_gpu": "true",
   "enable_tpu": "false",
   "enable_internet": "true",

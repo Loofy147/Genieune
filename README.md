@@ -1,4 +1,26 @@
-# Dynamic Entropy Genuineness Framework (Version 2.1 Refined)
+---
+title: Dynamic Entropy Genuineness Framework V2.2
+emoji: 🧠
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+app_file: app.py
+pinned: false
+license: apache-2.0
+language:
+- en
+python_version: 3.11
+tags:
+- mechanistic-interpretability
+- genuineness
+- transformer
+- dynamic-entropy
+metrics:
+- genuineness-score
+- token-cost
+---
+
+# Dynamic Entropy Genuineness Framework (Version 2.2 Advanced)
 
 This repository implements the **Dynamic Entropy Genuineness Framework**, a mechanistic interpretability and architectural evolution approach for analyzing and training Transformers. The framework uses a 2D Phase Space to distinguish between mechanical pattern matching and genuine computation.
 
@@ -18,56 +40,45 @@ Measures the internal complexity and attention variance.
 - **Shannon Entropy (H)**: $H(i) = -\sum_j A_{i,j} \log_2(A_{i,j})$
 - **Collapse Event**: Sudden drop in entropy between layers or tokens, $\Delta H < -0.20$.
 
-## Full Version 2.1 Implementation
+## Version 2.2 Advanced Implementation
 
-The repository has transitioned from simulations to a functional **Genuine Transformer** (V2.1) architecture with the following features:
+The framework has evolved into **Version 2.2 Advanced**, featuring:
 
-### 1. Rotary Positional Embeddings (RoPE)
-Integrated relative positional encoding for enhanced sequence modeling and attention stability.
+### 1. Learned Genuineness Gate (Adaptive Recurrence)
+A neural gating mechanism that monitors hidden states and entropy to determine if additional reasoning passes are required.
 
-### 2. Mechanistic Recurrence (Dynamic Routing)
-The model monitors the **G-score** (entropy variance) in real-time during the forward pass.
-- **Elaboration Pull Detection**: If the G-score drops significantly between reasoning layers, the hidden state is routed back through the reasoning block to "re-diffuse" attention and stabilize the thought.
-- **Dynamic Exit**: The model exits the reasoning loop once a sustained high G-score threshold is met.
+### 2. Global G-Budgeting
+Computational expenditure management across reasoning steps to ensure efficiency and stability.
 
-### 3. Thermodynamic Regularization
+### 3. Layer-Wise Thermodynamic Regularization
 An advanced loss function that:
 - Rewards **high attention variance** (internal complexity).
 - Penalizes **static, low-entropy states** (mechanical pattern matching).
-- Penalizes **premature entropy collapse** between layers.
+- Implements **layer-wise decay** to prioritize complexity in early reasoning layers.
 
 ## Repository Structure
 
-- `genuine_model.py`: Core architecture (Version 2.1) including RoPE, Recurrence, and the Regularizer.
-- `sustained_genuineness.py`: Logic utilities for G-score tracking and routing.
-- `kaggle_analysis.py`: Full analysis pipeline. Evaluates prompts using V1 interpretability and V2.1 model metrics.
-- `train_v2_advanced.py`: Advanced training pipeline for V2.1 models on complex reasoning tasks.
-- `phase_dynamics.py`: Original V1 mechanistic interpretability tools.
-- `AGENTS.md`: Technical instructions and codebase overview.
+- `genuine_model.py`: Version 2.2 architecture (Gating, Budgeting, Regularizer).
+- `sustained_genuineness.py`: Logic utilities for G-score tracking.
+- `kaggle_analysis.py`: Main analysis pipeline for evaluating prompt trajectories.
+- `train_v2_advanced.py`: Advanced training for V2.2 on Contextual Parity Pointer tasks.
+- `app.py`: Interactive Streamlit UI for the Hugging Face Space.
+- `V2_2_TECHNICAL_REPORT.md`: Detailed theory and experimental results.
 
 ## Installation & Usage
 
 ### Dependencies
-- `transformer-lens`, `torch`, `numpy`, `scipy`, `matplotlib`
+- `transformer-lens`, `torch`, `numpy`, `scipy`, `matplotlib`, `streamlit`
 
-### Running Analysis
+### Running the UI
 ```bash
-python3 kaggle_analysis.py
-```
-This script evaluates a prompt, generates Phase Space plots for GPT-2 (V1), and runs the refined V2.1 model to track its G-trajectory and thermodynamic loss.
-
-### Running Tests
-```bash
-PYTHONPATH=. python3 -m unittest discover tests
+streamlit run app.py
 ```
 
 ### Training
 ```bash
 python3 train_v2_advanced.py
 ```
-
-## Kaggle Deployment
-Automated via `deploy_kaggle.sh`. Requires `KAGGLE_API_TOKEN` environment variable and `kaggle` CLI.
 
 ## Phase Space Quadrants (V1)
 
@@ -79,18 +90,4 @@ Automated via `deploy_kaggle.sh`. Requires `KAGGLE_API_TOKEN` environment variab
 | **GENUINE_COMMITTED** | High-cost reasoning (Rare) |
 
 ---
-*Developed under the Dynamic Entropy Genuineness Framework (Version 2.1).*
-
-## Roadmap & Implementation Checklist
-
-### 🚀 Roadmap
-- [ ] **V2.2: Advanced Recurrence Control**: Implement adaptive gating for the reasoning loop based on gradient-signal monitoring.
-- [ ] **V3.0: Latent Reasoner Decoupling**: Fully separate the latent reasoning space from the syntax decoder, using a cross-attention bridge.
-- [ ] **Interpretability Suite**: Add support for path-patching and logit lens visualization within the Genuineness Phase Space.
-- [ ] **G-score Stability Optimization**: Refine the Thermodynamic Regularizer to handle longer sequences and prevent training instabilities.
-
-### ✅ Implementation Checklist
-- [ ] **Architecture Check**: Ensure RoPE frequency precomputation matches the target sequence length.
-- [ ] **Training Stability**: Verify the Thermodynamic loss weight ($\lambda$) is tuned to prevent gradient explosion.
-- [ ] **Analysis Validation**: Confirm `kaggle_analysis.py` produces both V1 Phase Space and V2 G-trajectory plots.
-- [ ] **Recurrence Verification**: Test that the `max_loops` parameter is correctly bounded in the model configuration.
+*Developed under the Dynamic Entropy Genuineness Framework (Version 2.2).*
