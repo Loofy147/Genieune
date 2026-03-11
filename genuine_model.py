@@ -158,7 +158,7 @@ class GenuineTransformer(nn.Module):
 # ══════════════════════════════════════════════════════════════════
 
 class ThermodynamicRegularizer:
-    def __init__(self, variance_weight=10.0, mechanical_penalty=0.45, collapse_penalty=10.0, layer_decay=0.92):
+    def __init__(self, variance_weight=5.0, mechanical_penalty=0.45, collapse_penalty=10.0, layer_decay=0.92):
         self.variance_weight = variance_weight
         self.mechanical_penalty = mechanical_penalty
         self.collapse_penalty = collapse_penalty
