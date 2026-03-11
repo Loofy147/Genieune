@@ -109,13 +109,13 @@ class GenuinenessGate(nn.Module):
         return self.gate_fc(feat)
 
 class GenuineTransformer(nn.Module):
-    def __init__(self, d_model=256, n_heads=8, n_layers=6, vocab_size=1000):
+    def __init__(self, d_model=512, n_heads=8, n_layers=12, vocab_size=1000):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, d_model)
         self.layers = nn.ModuleList([GenuineLayer(d_model, n_heads) for _ in range(n_layers)])
         self.gate = GenuinenessGate(d_model, n_heads)
         self.fc_out = nn.Linear(d_model, vocab_size)
-        self.register_buffer("freqs_cis", precompute_freqs_cis(d_model // n_heads, 128))
+        self.register_buffer("freqs_cis", precompute_freqs_cis(d_model // n_heads, 256))
         self.n_heads = n_heads
 
     def forward(self, x, g_budget=12):

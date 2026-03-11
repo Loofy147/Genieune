@@ -114,13 +114,13 @@ class GenuinenessGate(nn.Module):
         return self.gate_fc(feat)
 
 class GenuineTransformer(nn.Module):
-    def __init__(self, d_model=256, n_heads=8, n_layers=6, vocab_size=1000):
+    def __init__(self, d_model=512, n_heads=8, n_layers=12, vocab_size=1000):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, d_model)
         self.layers = nn.ModuleList([GenuineLayer(d_model, n_heads) for _ in range(n_layers)])
         self.gate = GenuinenessGate(d_model, n_heads)
         self.fc_out = nn.Linear(d_model, vocab_size)
-        self.register_buffer("freqs_cis", precompute_freqs_cis(d_model // n_heads, 128))
+        self.register_buffer("freqs_cis", precompute_freqs_cis(d_model // n_heads, 256))
 
     def forward(self, x, g_budget=12):
         batch_size, seq_len = x.shape
@@ -181,11 +181,11 @@ def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Training Advanced V2.2 on {device}")
 
-    batch_size = 16
-    n_epochs = 10000
+    batch_size = 32
+    n_epochs = 15000
     vocab_size = 1000
 
-    model = GenuineTransformer(d_model=256, n_heads=8, n_layers=6, vocab_size=vocab_size).to(device)
+    model = GenuineTransformer(d_model=512, n_heads=8, n_layers=12, vocab_size=vocab_size).to(device)
     regularizer = ThermodynamicRegularizer()
 
     optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=2e-2)
@@ -216,13 +216,13 @@ def train():
     print("Starting Training with Complexity Scaling...")
     for epoch in range(1, n_epochs + 1):
         # Complexity Scaling: Sequence length increases from 8 to 32
-        current_seq_len = 8 + int(24 * (epoch / n_epochs))
+        current_seq_len = 8 + int(56 * (epoch / n_epochs))
 
         model.train()
         data, target = get_pointer_parity_batch(current_seq_len)
 
         optimizer.zero_grad()
-        logits, entropies = model(data)
+        logits, entropies = model(data, g_budget=24)
 
         task_loss = criterion(logits.view(-1, vocab_size), target.view(-1))
         thermo_loss = regularizer.calculate_loss(entropies)
