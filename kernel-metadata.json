@@ -1,6 +1,6 @@
 {
-  "id": "hichambedrani/genuine-transformer-v2-advanced",
-  "title": "Genuine Transformer V2.2 Scaled Training V2",
+  "id": "hichambedrani/genuine-transformer-v2-2-scaled-v3",
+  "title": "Genuine Transformer V2.2 Scaled V3 Equilibrium",
   "code_file": "train_v2_advanced.py",
   "language": "python",
   "kernel_type": "script",

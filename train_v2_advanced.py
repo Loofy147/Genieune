@@ -150,7 +150,7 @@ class GenuineTransformer(nn.Module):
         return logits, all_entropies
 
 class ThermodynamicRegularizer:
-    def __init__(self, variance_weight=15.0, mechanical_penalty=0.45, collapse_penalty=10.0, layer_decay=0.92):
+    def __init__(self, variance_weight=10.0, mechanical_penalty=0.45, collapse_penalty=10.0, layer_decay=0.92):
         self.variance_weight = variance_weight
         self.mechanical_penalty = mechanical_penalty
         self.collapse_penalty = collapse_penalty
@@ -188,8 +188,8 @@ def train():
     model = GenuineTransformer(d_model=512, n_heads=8, n_layers=12, vocab_size=vocab_size).to(device)
     regularizer = ThermodynamicRegularizer()
 
-    optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=2e-2)
-    scheduler = OneCycleLR(optimizer, max_lr=1e-3, steps_per_epoch=1, epochs=n_epochs)
+    optimizer = optim.AdamW(model.parameters(), lr=5e-4, weight_decay=2e-2)
+    scheduler = OneCycleLR(optimizer, max_lr=5e-4, steps_per_epoch=1, epochs=n_epochs)
     criterion = nn.CrossEntropyLoss()
 
     def get_pointer_parity_batch(current_seq_len):
@@ -207,7 +207,7 @@ def train():
         target_tokens = data.gather(1, pointer_idx.unsqueeze(1)).squeeze(1)
 
         # Parity logic for target
-        target = torch.where(target_tokens % 2 == 0, (target_tokens * 2 + 1) % vocab_size, (target_tokens // 2 - 1) % vocab_size)
+        target = target_tokens % 2
 
         # Expand target to all positions for simplicity (or just last token)
         full_target = target.unsqueeze(1).repeat(1, current_seq_len)
@@ -227,7 +227,7 @@ def train():
         task_loss = criterion(logits.view(-1, vocab_size), target.view(-1))
         thermo_loss = regularizer.calculate_loss(entropies)
 
-        total_loss = task_loss + 1.2 * thermo_loss
+        total_loss = task_loss + 0.6 * thermo_loss
 
         total_loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
