@@ -10,7 +10,7 @@ def setup_environment():
         print("Dependencies already installed.")
     except ImportError:
         print("Installing dependencies...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "transformer-lens==2.1.0", "transformers==4.44.0", "beartype>=0.16.2"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "transformer-lens==2.1.0", "transformers==4.44.0"])
 
 if __name__ == "__main__":
     if "KAGGLE_URL_BASE" in os.environ:
