@@ -1,6 +1,6 @@
 {
-  "id": "hichambedrani/genuine-transformer-v2-advanced",
-  "title": "Genuine Transformer V2.2 Advanced Training",
+  "id": "hichambedrani/genuine-transformer-v3-sparsity-v2",
+  "title": "Genuine Transformer V3.0 Sparsity V2",
   "code_file": "train_v2_advanced.py",
   "language": "python",
   "kernel_type": "script",

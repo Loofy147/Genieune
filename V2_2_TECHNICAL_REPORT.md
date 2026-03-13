@@ -1,7 +1,7 @@
-# Dynamic Entropy Genuineness Framework: Version 2.2 Advanced
+# Dynamic Entropy Genuineness Framework: Version 2.2 Scaled
 
 ## Overview
-Version 2.2 Advanced introduces an Adaptive Genuineness Engine designed to foster high-fidelity reasoning in Transformers. The core innovation lies in treating the model's internal complexity (Genuineness) as a learned, gated resource.
+Version 2.2 Scaled introduces an Adaptive Genuineness Engine designed to foster high-fidelity reasoning in Transformers. The core innovation lies in treating the model's internal complexity (Genuineness) as a learned, gated resource.
 
 ## Architectural Upgrades
 ### 1. Learned Genuineness Gate
@@ -23,7 +23,7 @@ The model is trained on the **Contextual Parity Pointer Task**, which requires:
 2. Attending to a distant target token.
 3. Calculating parity and applying a non-linear transformation.
 
-**Optimization**: The sequence length is gradually increased from 8 to 32 tokens over 10,000 epochs, forcing the model to adapt its reasoning depth as the task grows in complexity.
+**Optimization**: The sequence length is gradually increased from 8 to 64 tokens over 15,000 epochs, forcing the model to adapt its reasoning depth as the task grows in complexity.
 
 ## Performance Targets
 - **G-Score**: > 0.65 (Stable high-entropy variance).
