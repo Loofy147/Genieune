@@ -3,6 +3,6 @@ numpy
 scipy
 matplotlib
 transformer-lens==2.1.0
-transformers==4.44.0
+transformers==5.0.0rc3
 tokenizers==0.19.1
 typeguard
